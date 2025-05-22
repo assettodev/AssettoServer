@@ -67,6 +67,10 @@ public class Race
         try
         {
             Course course = await GetCourseAsync();
+            if (!_configuration.useTrackFinish)
+            {
+                SendFinishLine(course);
+            }
 
             // First teleport players to their starting positions.
             await TeleportToStartAsync(Leader, Follower, course);
@@ -433,5 +437,11 @@ public class Race
                 }
             };
         return startingPositions;
+    }
+
+    private void SendFinishLine(Course course)
+    {
+        Leader.Client!.SendPacket(new FinishLinePacket { FinishPoint1 = course.FinishLine![0], FinishPoint2 = course.FinishLine[1] });
+        Follower.Client!.SendPacket(new FinishLinePacket { FinishPoint1 = course.FinishLine![0], FinishPoint2 = course.FinishLine[1] });
     }
 }
