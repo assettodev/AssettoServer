@@ -16,8 +16,6 @@ public class Race
     private readonly TougeConfiguration _configuration;
     private readonly Touge _plugin;
 
-    public bool HasStarted { get; private set; }
-
     public enum JumpstartResult
     {
         None,            // No jumpstart
@@ -77,8 +75,6 @@ public class Race
 
             SendMessage("Race starting soon...");
             await Task.Delay(3000);
-
-            HasStarted = true; // I don't know if this is used anywhere tbh.
 
             // Race countdown.
             while (!isGo)
