@@ -1,7 +1,7 @@
 ﻿using AssettoServer.Server;
 using TougePlugin.Packets;
 using Serilog;
-using AssettoServer.Shared.Network.Packets.Shared;
+using TougePlugin.Models;
 
 namespace TougePlugin;
 
