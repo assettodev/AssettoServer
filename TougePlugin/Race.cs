@@ -30,9 +30,12 @@ public class Race
     private readonly TaskCompletionSource<bool> secondLapCompleted = new();
     private readonly TaskCompletionSource<ACTcpClient> _disconnected = new();
     private readonly TaskCompletionSource<bool> _followerFirst = new();
+    private readonly TaskCompletionSource<ACTcpClient> _forfeit = new();
 
     private string LeaderName { get; }
     private string FollowerName { get; }
+
+    private bool IsGo = false;
 
     public delegate Race Factory(EntryCar leader, EntryCar follower);
 
@@ -61,24 +64,28 @@ public class Race
     public async Task<RaceResult> RaceAsync()
     {
         EntryCar? winner = null;
-        bool isGo = false;
 
         try
         {
-            Course course = await GetCourseAsync();
-            if (!_configuration.useTrackFinish)
+            var setupTask = Task.Run(() => SetUpRaceAsync());
+            var forfeitTask = _forfeit.Task;
+             
+            var completedSetup = await Task.WhenAny(setupTask, forfeitTask);
+
+            if (completedSetup == forfeitTask)
             {
-                SendFinishLine(course);
+                SendMessage("Race cancelled due to player forfeit.");
+                return RaceResult.Disconnected(forfeitTask.Result.EntryCar);
             }
 
-            // First teleport players to their starting positions.
-            await TeleportToStartAsync(Leader, Follower, course);
+            Course course = await setupTask;
 
             SendMessage("Race starting soon...");
-            await Task.Delay(3000);
+            if (await WaitWithForfeitAsync(Task.Delay(3000)))
+                return RaceResult.Disconnected(_forfeit.Task.Result.EntryCar);
 
             // Race countdown.
-            while (!isGo)
+            while (!IsGo)
             {
                 byte signalStage = 0;
                 while (signalStage < 3)
@@ -124,10 +131,11 @@ public class Race
                             }
                         }
                         _ = SendTimedMessageAsync("Go!");
-                        isGo = true;
+                        IsGo = true;
                         break;
                     }
-                    await Task.Delay(1000);
+                    if (await WaitWithForfeitAsync(Task.Delay(1000)))
+                        return RaceResult.Disconnected(_forfeit.Task.Result.EntryCar);
                     signalStage++;
                 }
             }
@@ -137,9 +145,9 @@ public class Race
             {
                 NotifyLookForFinish(true);
             }
-            Task completed = await Task.WhenAny(secondLapCompleted.Task, _disconnected.Task, _followerFirst.Task);
+            Task completedRace = await Task.WhenAny(secondLapCompleted.Task, _disconnected.Task, _followerFirst.Task);
 
-            if (completed == _disconnected.Task)
+            if (completedRace == _disconnected.Task)
             {
                 SendMessage("Race cancelled due to disconnection or forfeit.");
                 return RaceResult.Disconnected(_disconnected.Task.Result.EntryCar);
@@ -153,7 +161,7 @@ public class Race
                     SendMessage($"{FollowerName} did not finish in time. {LeaderName} wins!");
                     winner = Leader;
                 }
-                else if (completed == _followerFirst.Task)
+                else if (completedRace == _followerFirst.Task)
                 {
                     SendMessage($"{FollowerName} overtook {LeaderName}. {FollowerName} wins!");
                     winner = Follower;
@@ -177,6 +185,7 @@ public class Race
             FinishRace();
         }
 
+        // Implement null check here. If null return disconnect.
         return RaceResult.Win(winner);
     }
 
@@ -237,7 +246,16 @@ public class Race
 
     internal void ForfeitPlayer(ACTcpClient sender)
     {
-        _disconnected.TrySetResult(sender);
+        if (IsGo)
+        {
+            // Race has started so simply set the result of the race to disconnected.
+            _disconnected.TrySetResult(sender);
+        }
+        else
+        {
+            // Race has not started yet so set result for forfeit task.
+            _forfeit.TrySetResult(sender);
+        }
         if (!_configuration.useTrackFinish)
         {
             sender.SendPacket(new FinishPacket { LookForFinish = false });
@@ -421,5 +439,31 @@ public class Race
     {
         Leader.Client!.SendPacket(new FinishLinePacket { FinishPoint1 = course.FinishLine![0], FinishPoint2 = course.FinishLine[1] });
         Follower.Client!.SendPacket(new FinishLinePacket { FinishPoint1 = course.FinishLine![0], FinishPoint2 = course.FinishLine[1] });
+    }
+
+    private async Task<Course> SetUpRaceAsync()
+    {
+        Course course = await GetCourseAsync();
+        if (!_configuration.useTrackFinish)
+        {
+            SendFinishLine(course);
+        }
+
+        // First teleport players to their starting positions.
+        await TeleportToStartAsync(Leader, Follower, course);
+        
+        return course;
+    }
+    private async Task<bool> WaitWithForfeitAsync(Task task)
+    {
+        var completed = await Task.WhenAny(task, _forfeit.Task);
+        if (completed == _forfeit.Task)
+        {
+            SendMessage("Race cancelled due to player forfeit.");
+            return true;
+        }
+
+        await task; // Propagate exceptions if needed
+        return false;
     }
 }
