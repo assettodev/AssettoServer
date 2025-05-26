@@ -17,10 +17,11 @@ public class EntryCarTougeSession
     private readonly EntryCar _entryCar;
     private readonly TougeSession.Factory _tougeSessionFactory;
     private readonly Func<RulesetType, ITougeRuleset> _rulesetFactory;
+    private readonly TougeConfiguration _configuration;
 
     internal TougeSession? CurrentSession { get; set; }
 
-    public EntryCarTougeSession(EntryCar entryCar, EntryCarManager entryCarManager, Touge plugin, TougeSession.Factory tougeSessionFactory, Func<RulesetType, ITougeRuleset> rulesetFactory)
+    public EntryCarTougeSession(EntryCar entryCar, EntryCarManager entryCarManager, Touge plugin, TougeSession.Factory tougeSessionFactory, Func<RulesetType, ITougeRuleset> rulesetFactory, TougeConfiguration configuration)
     {
         _entryCar = entryCar;
         _entryCarManager = entryCarManager;
@@ -28,6 +29,7 @@ public class EntryCarTougeSession
         _tougeSessionFactory = tougeSessionFactory;
         _rulesetFactory = rulesetFactory;
         _entryCar.ResetInvoked += OnResetInvoked;
+        _configuration = configuration;
     }
 
     private void OnResetInvoked(EntryCar sender, EventArgs args)
@@ -118,7 +120,7 @@ public class EntryCarTougeSession
                 else
                 {
                     // Create a new TougeSession instance and set this for both cars.
-                    var ruleset = _rulesetFactory(RulesetType.BattleStage);
+                    var ruleset = _rulesetFactory(_configuration.RuleSetType);
                     currentSession = _tougeSessionFactory(_entryCar, car, ruleset);
                     CurrentSession = currentSession;
                     _plugin.GetSession(car).CurrentSession = currentSession;
