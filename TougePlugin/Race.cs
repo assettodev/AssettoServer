@@ -153,9 +153,9 @@ public class Race
                 }
 
                 if (signalStage == 0)
-                    _ = SendTimedMessageAsync("Ready...");
+                    _ = SendTimedMessageAsync("Ready...", true);
                 else if (signalStage == 1)
-                    _ = SendTimedMessageAsync("Set...");
+                    _ = SendTimedMessageAsync("Set...", true);
                 else if (signalStage == 2)
                 {
                     if (_configuration.IsRollingStart)
@@ -168,7 +168,7 @@ public class Race
                             break;
                         }
                     }
-                    _ = SendTimedMessageAsync("Go!");
+                    _ = SendTimedMessageAsync("Go!", true);
                     IsGo = true;
                     break;
                 }
@@ -340,7 +340,7 @@ public class Race
         }
     }
 
-    private async Task SendTimedMessageAsync(string message)
+    private async Task SendTimedMessageAsync(string message, bool isCountdown = false)
     {
         bool isChallengerHighPing = Leader.Ping > Follower.Ping;
         EntryCar highPingCar, lowPingCar;
@@ -356,11 +356,9 @@ public class Race
             lowPingCar = Leader;
         }
 
-        highPingCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = message });
-        Touge.SendNotification(highPingCar.Client, message);
+        Touge.SendNotification(highPingCar.Client, message, isCountdown);
         await Task.Delay(highPingCar.Ping - lowPingCar.Ping);
-        lowPingCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = message });
-        Touge.SendNotification(lowPingCar.Client, message);
+        Touge.SendNotification(lowPingCar.Client, message, isCountdown);
     }
 
     // Check if the cars are still in their starting positions.
