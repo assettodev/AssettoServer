@@ -15,8 +15,9 @@ public class Race
     public EntryCar Follower { get; }
 
     private readonly EntryCarManager _entryCarManager;
-    public readonly TougeConfiguration _configuration;
+    public readonly TougeConfiguration Configuration;
     private readonly Touge _plugin;
+    public readonly SessionManager SessionManager;
 
     public enum JumpstartResult
     {
@@ -29,7 +30,7 @@ public class Race
     private bool LeaderSetLap = false;
     public bool FollowerSetLap = false;
     
-    private readonly TaskCompletionSource<ACTcpClient> _forfeit = new();
+    public readonly TaskCompletionSource<ACTcpClient> Forfeit = new();
     public TaskCompletionSource<bool> SecondLapCompleted { get; } = new();
     public TaskCompletionSource<ACTcpClient> Disconnected { get; } = new();
     public TaskCompletionSource<bool> FollowerFirst { get; } = new();
@@ -43,7 +44,7 @@ public class Race
 
     public delegate Race Factory(EntryCar leader, EntryCar follower, IRaceType raceType);
 
-    public Race(EntryCar leader, EntryCar follower, IRaceType raceType, EntryCarManager entryCarManager, TougeConfiguration configuration, Touge plugin)
+    public Race(EntryCar leader, EntryCar follower, IRaceType raceType, EntryCarManager entryCarManager, TougeConfiguration configuration, Touge plugin, SessionManager sessionManager)
     {
         Leader = leader;
         Follower = follower;
@@ -52,8 +53,9 @@ public class Race
         FollowerName = Follower.Client?.Name!;
 
         _entryCarManager = entryCarManager;
-        _configuration = configuration;
+        Configuration = configuration;
         _plugin = plugin;
+        SessionManager = sessionManager;
         _raceType = raceType;
 
         Leader.Client!.Disconnecting += OnClientDisconnected;
@@ -72,7 +74,7 @@ public class Race
 
             SendMessage("Race starting soon...");
             if (await WaitWithForfeitAsync(Task.Delay(3000)))
-                return RaceResult.Disconnected(_forfeit.Task.Result.EntryCar);
+                return RaceResult.Disconnected(Forfeit.Task.Result.EntryCar);
 
             var countdownResult = await RunCountdownAsync(course);
             if (countdownResult != null)
@@ -98,7 +100,7 @@ public class Race
     private async Task<Course?> InitializeRaceAsync()
     {
         var setupTask = Task.Run(() => SetUpRaceAsync());
-        var forfeitTask = _forfeit.Task;
+        var forfeitTask = Forfeit.Task;
 
         var completedSetup = await Task.WhenAny(setupTask, forfeitTask);
 
@@ -126,7 +128,7 @@ public class Race
             byte signalStage = 0;
             while (signalStage < 3)
             {
-                if (!_configuration.IsRollingStart)
+                if (!Configuration.IsRollingStart)
                 {
                     JumpstartResult jumpstart = AreInStartingPos(course);
                     if (jumpstart != JumpstartResult.None)
@@ -156,7 +158,7 @@ public class Race
                     _ = SendTimedMessageAsync("Set...", true);
                 else if (signalStage == 2)
                 {
-                    if (_configuration.IsRollingStart)
+                    if (Configuration.IsRollingStart)
                     {
                         // Check if cars are close enough to each other to give a valid "Go!".
                         if (!IsValidRollingStartPos())
@@ -171,7 +173,7 @@ public class Race
                     break;
                 }
                 if (await WaitWithForfeitAsync(Task.Delay(1000)))
-                    return RaceResult.Disconnected(_forfeit.Task.Result.EntryCar);
+                    return RaceResult.Disconnected(Forfeit.Task.Result.EntryCar);
                 signalStage++;
             }
         }
@@ -217,7 +219,7 @@ public class Race
         else if (LeaderSetLap && !FollowerSetLap)
         {
             // Make this time also configurable as outrun time.
-            int outrunTimer = (int)(_configuration.OutrunTime * 1000f);
+            int outrunTimer = (int)(Configuration.OutrunTime * 1000f);
             _ = Task.Delay(outrunTimer).ContinueWith(_ => SecondLapCompleted.TrySetResult(false));
         }
 
@@ -228,22 +230,22 @@ public class Race
 
     private void OnClientDisconnected(ACTcpClient sender, EventArgs args)
     {
-        Disconnected.TrySetResult(sender);
+        ForfeitPlayer(sender);
     }
 
     internal void ForfeitPlayer(ACTcpClient sender)
     {
-        if (IsGo)
+        if (IsGo && _raceType is CourseRace)
         {
-            // Race has started so simply set the result of the race to disconnected.
+            // Course race has started so simply set the result of the race to disconnected.
             Disconnected.TrySetResult(sender);
         }
         else
         {
             // Race has not started yet so set result for forfeit task.
-            _forfeit.TrySetResult(sender);
+            Forfeit.TrySetResult(sender);
         }
-        if (!_configuration.UseTrackFinish)
+        if (!Configuration.UseTrackFinish)
         {
             sender.SendPacket(new FinishPacket { LookForFinish = false });
         }
@@ -435,7 +437,7 @@ public class Race
     private async Task<Course?> SetUpRaceAsync()
     {
         Course course = await GetCourseAsync();
-        if (!_configuration.UseTrackFinish)
+        if (!Configuration.UseTrackFinish)
         {
             SendFinishLine(course);
         }
@@ -453,8 +455,8 @@ public class Race
     }
     private async Task<bool> WaitWithForfeitAsync(Task task)
     {
-        var completed = await Task.WhenAny(task, _forfeit.Task);
-        if (completed == _forfeit.Task)
+        var completed = await Task.WhenAny(task, Forfeit.Task);
+        if (completed == Forfeit.Task)
         {
             SendMessage("Race cancelled due to player forfeit.");
             return true;
