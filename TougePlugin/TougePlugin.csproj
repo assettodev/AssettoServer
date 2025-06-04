@@ -69,6 +69,11 @@
       <None Update="assets\Tutorial.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="assets\Toggle.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
