@@ -668,7 +668,7 @@ function script.drawUI(dt)
         local notificationPos = vec2(windowWidth-scaling.size(755), windowHeight-scaling.size(222))
         if hasActiveInvite then
             -- If there is an active invite, draw it above.
-            notificationPos = scaling.vec2(windowWidth-755, windowHeight-414)
+            notificationPos = vec2(windowWidth-scaling.size(755), windowHeight-scaling.size(414))
         end
 
         ui.transparentWindow("notificationWindow", notificationPos, scaling.vec2(705,172), function ()
