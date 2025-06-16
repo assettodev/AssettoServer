@@ -1,4 +1,4 @@
-local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/touge/"
+﻿local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/touge/"
 
 local windowWidth = sim.windowWidth
 local windowHeight = sim.windowHeight
@@ -50,8 +50,11 @@ local selectedPlayerId = -1
 local lastLobbyStatusRequest = 0
 local lobbyCooldown = 1.0  -- Cooldown in seconds
 local courseNames = {}
+local courseListLength = 768
 local isOutrunAllowed = false
 local isToggleCourse = true
+local cardSpacingY = 180
+local cardSize = scaling.vec2(737, 172)
 
 local standings = { 0, 0, 0 }  -- Default, no rounds have been completed.
 local standingWindowSize = scaling.vec2(387, 213)
@@ -249,6 +252,12 @@ local initializationEvent = ac.OnlineEvent(
         for courseName in string.gmatch(message.courseNames, "([^`]+)") do
             table.insert(courseNames, courseName)
         end
+
+        if #courseNames > 5 then
+            courseListLength = #courseNames * cardSize.y + (#courseNames - 1) * (cardSpacingY - cardSize.y) + cardSpacingY
+        end
+
+
     end
 )
 
@@ -373,6 +382,18 @@ function DrawText(content, textFont, fontSize, pos)
     ui.popDWriteFont()
 end
 
+function FindFontSize(text, startSize, font, maxWidth)
+    ui.pushDWriteFont(font)
+    local fontSize = scaling.size(startSize)
+    local textSize = ui.measureDWriteText(text, fontSize)
+    while textSize.x > scaling.size(maxWidth) do
+        fontSize = fontSize - scaling.size(2)
+        textSize = ui.measureDWriteText(text, fontSize)
+    end
+    ui.popDWriteFont()
+    return fontSize
+end
+
 local function checkTimeout(activatedAt, duration)
     if activatedAt ~= nil and os.clock() - activatedAt >= duration then
         return true
@@ -399,8 +420,8 @@ function script.drawUI(dt)
                 for i = 1, dots do
                     local result = standings[i]
                     -- Calculate position for each circle (horizontally centered)
-                    local circleRadius = 25
-                    local spacing = 40
+                    local circleRadius = scaling.size(25)
+                    local spacing = scaling.size(40)
                     local totalWidth = (dots * 2 * circleRadius) + (dots - 1) * spacing
                     local xStart = (standingWindowSize.x - totalWidth) / 2 + circleRadius
                     local xPos = xStart + (2 * circleRadius + spacing) * (i - 1)
@@ -416,7 +437,7 @@ function script.drawUI(dt)
                         color = rgbm(0.5, 0.5, 0.5, 0.7) -- Dark grey for tie
                     end
                     -- Draw circle with appropriate color
-                    ui.drawCircleFilled(vec2(xPos, scaling.size(145)), scaling.size(circleRadius), color, 32)
+                    ui.drawCircleFilled(vec2(xPos, scaling.size(145)), circleRadius, color, 32)
                 end
             elseif currentHudState == HudStates.SuddenDeath then
                 DrawText("Sudden Death!", fontBold, 32, scaling.vec2(44, 80))
@@ -482,7 +503,6 @@ function script.drawUI(dt)
             ui.drawImage(inviteMenuPath, vec2(0,0), scaling.vec2(768,1145))
             local index = 1
 
-            local cardSpacingY = 180  -- Space between cards vertically
             local baseY = 150         -- Starting Y position
 
             local mousePos = ui.mouseLocalPos()
@@ -525,12 +545,10 @@ function script.drawUI(dt)
                 end
 
                 local cardPos = scaling.vec2(32, yOffset)
-                local cardSize = scaling.vec2(737, 172)
                 local cardBottomRight = cardPos + cardSize
 
                 -- Draw player card
-                local cardSize = scaling.vec2(737, yOffset + 172)
-                ui.drawImage(playerCardPath, cardPos, cardSize)
+                ui.drawImage(playerCardPath, cardPos, vec2(cardSize.x, yOffset + 172))
 
                 -- Check for mouse click inside card bounds
                 if not mouseClickHandled and ui.mouseClicked() then
@@ -556,13 +574,7 @@ function script.drawUI(dt)
                 ui.pushDWriteFont(fontBold)
                 local color = nearbyPlayers[index].inRace and rgbm(0.5, 0.5, 0.5, 1) or rgbm(1, 1, 1, 1)
                 
-                -- Find the right font size.
-                local fontSize = 48 -- Largest possible size
-                local textSize = ui.measureDWriteText(nearbyPlayers[index].name, scaling.size(fontSize))
-                while textSize.x > scaling.size(550) do
-                    fontSize = fontSize - 8
-                    textSize = ui.measureDWriteText(nearbyPlayers[index].name, scaling.size(fontSize))
-                end
+                local fontSize = FindFontSize(nearbyPlayers[index].name, 48, fontBold, 550)
                 ui.dwriteDrawTextClipped(nearbyPlayers[index].name, scaling.size(fontSize), cardPos + scaling.vec2(180, 40), cardSize, ui.Alignment.Start, ui.Alignment.Start, false, color)
                 ui.popDWriteFont()
 
@@ -590,51 +602,56 @@ function script.drawUI(dt)
     if hasCourseSelectOpen then
         ui.transparentWindow("courseSelectWindow", vec2(windowWidth - scaling.size(818), scaling.size(50)), scaling.vec2(768,1145), function ()
             ui.drawImage(inviteMenuPath, vec2(0,0), scaling.vec2(768,1145))
-
-            local cardSpacingY = 180  -- Space between cards vertically
-            local baseY = 150         -- Starting Y position
-
-            local mousePos = ui.mouseLocalPos()
-
             DrawText("Select a course", font, 48, scaling.vec2(40, 40))
 
-            for index, course in ipairs(courseNames) do
-                local yOffset = baseY + (index - 1) * cardSpacingY  -- Calculate Y offset
+            ui.childWindow("coursesListWindow", scaling.vec2(768,1130), function ()
+                -- determine the length based on the amount of tracks
+                ui.childWindow("actualList", vec2(scaling.size(768), courseListLength), function ()
+                    local baseY = 150         -- Starting Y position
 
-                local cardPos = scaling.vec2(32, yOffset)
-                local cardSize = scaling.vec2(737, 172)
-                local cardBottomRight = cardPos + cardSize
+                    local mousePos = ui.mouseLocalPos()
+                    for index, course in ipairs(courseNames) do
+                        local yOffset = baseY + (index - 1) * cardSpacingY  -- Calculate Y offset
 
-                -- Draw player card
-                local cardSize = scaling.vec2(737, yOffset + 172)
-                ui.drawImage(playerCardPath, cardPos, cardSize)
+                        local cardPos = scaling.vec2(32, yOffset)
+                        local cardSize = scaling.vec2(737, 172)
+                        local cardBottomRight = cardPos + cardSize
 
-                -- Check for mouse click inside card bounds
-                if not mouseClickHandled and ui.mouseClicked() then
-                    if mousePos.x >= cardPos.x and mousePos.x <= cardBottomRight.x and
-                    mousePos.y >= cardPos.y and mousePos.y <= cardBottomRight.y then
-                        -- Send invite with the selected course
-                        print(course)
-                        inviteEvent({inviteSenderName = "", inviteRecipientGuid = selectedPlayerId, courseName = course, isCourse = isToggleCourse})
-                        hasCourseSelectOpen = false
-                        mouseClickHandled = true
+                        -- Draw player card
+                        local cardSize = scaling.vec2(737, yOffset + 172)
+                        ui.drawImage(playerCardPath, cardPos, cardSize)
+
+                        -- Check for mouse click inside card bounds
+                        if not mouseClickHandled and ui.mouseClicked() then
+                            if mousePos.x >= cardPos.x and mousePos.x <= cardBottomRight.x and
+                            mousePos.y >= cardPos.y and mousePos.y <= cardBottomRight.y then
+                                -- Send invite with the selected course
+                                inviteEvent({inviteSenderName = "", inviteRecipientGuid = selectedPlayerId, courseName = course, isCourse = isToggleCourse})
+                                hasCourseSelectOpen = false
+                                mouseClickHandled = true
+                            end
+                        end
+
+                        -- Draw course name text.
+                        ui.pushDWriteFont(fontBold)
+                        local fontSize = FindFontSize(course, 48, fontBold, 550)
+                        -- Find the right font size.
+                        local fontSize = 48 -- Largest possible size
+                        local textSize = ui.measureDWriteText(course, scaling.size(fontSize))
+                        while textSize.x > scaling.size(550) do
+                            fontSize = fontSize - 8
+                            textSize = ui.measureDWriteText(course, scaling.size(fontSize))
+                        end
+                        ui.dwriteDrawTextClipped(course, scaling.size(fontSize), cardPos + scaling.vec2(180, 40), cardSize, ui.Alignment.Start, ui.Alignment.Start, false)
+                        ui.popDWriteFont()
                     end
-                end
-
-                -- Draw course name text.
-                ui.pushDWriteFont(fontBold)
-                -- Find the right font size.
-                local fontSize = 48 -- Largest possible size
-                local textSize = ui.measureDWriteText(course, scaling.size(fontSize))
-                while textSize.x > scaling.size(550) do
-                    fontSize = fontSize - 8
-                    textSize = ui.measureDWriteText(course, scaling.size(fontSize))
-                end
-                ui.dwriteDrawTextClipped(course, scaling.size(fontSize), cardPos + scaling.vec2(180, 40), cardSize, ui.Alignment.Start, ui.Alignment.Start, false)
-                ui.popDWriteFont()
-            end
-
+                end)
         end)
+
+    end)
+
+        
+
     end
 
     -- Draw incoming invite hud element
@@ -658,7 +675,8 @@ function script.drawUI(dt)
 
             ui.drawImage(mKeyPath, scaling.vec2(560,32), scaling.vec2(670,142))
 
-            DrawText(tostring(inviteSenderName), fontBold, 48, scaling.vec2(295,35))
+            local fontSize = FindFontSize(inviteSenderName, 48, fontBold, 270)
+            DrawText(tostring(inviteSenderName), fontBold, fontSize, scaling.vec2(295,35))
             DrawText("Challenged you!", font, 36, scaling.vec2(180,95))
         end)
     end
