@@ -1,6 +1,7 @@
 ﻿using AssettoServer.Server;
 using TougePlugin.Packets;
 using Serilog;
+using AssettoServer.Shared.Network.Packets.Shared;
 
 namespace TougePlugin;
 
@@ -85,7 +86,7 @@ public class TougeSession
                 EntryCar loser = result.ResultCar! == Challenged ? Challenger : Challenged;
                 string loserName = loser.Client?.Name!;
                 string winnerName = result.ResultCar!.Client?.Name!;
-                _entryCarManager.BroadcastChat($"{winnerName} beat {loserName}");
+                _entryCarManager.BroadcastPacket(new ChatMessage { SessionId = 255, Message = $"{winnerName} beat {loserName}"});
             }
         }
         catch (Exception ex)

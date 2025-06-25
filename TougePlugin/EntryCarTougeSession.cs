@@ -2,6 +2,8 @@
 using AssettoServer.Network.Tcp;
 using AssettoServer.Server;
 using TougePlugin.Packets;
+using AssettoServer.Shared.Network.Packets.Shared;
+
 
 namespace TougePlugin;
 
@@ -118,7 +120,7 @@ public class EntryCarTougeSession
                     _plugin.GetSession(car).CurrentSession = currentSession;
 
                     // Send messages to both players
-                    _entryCar.Client?.SendChatMessage($"You have challenged {car.Client!.Name} to a touge session.");
+                    _entryCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = $"You have challenged {car.Client?.Name} to a touge session." });
                     car.Client?.SendPacket(new InvitePacket { InviteSenderName = _entryCar.Client!.Name! });
 
                     _ = Task.Delay(10000).ContinueWith(_ =>
@@ -129,8 +131,8 @@ public class EntryCarTougeSession
                             _plugin.GetSession(car).CurrentSession = null;
 
                             var timeoutMessage = "Touge session request has timed out.";
-                            _entryCar.Client?.SendChatMessage(timeoutMessage);
-                            car.Client?.SendChatMessage(timeoutMessage);
+                            _entryCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = timeoutMessage });
+                            car.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = timeoutMessage });
                         }
                     });
                 }

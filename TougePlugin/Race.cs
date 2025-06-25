@@ -3,6 +3,7 @@ using AssettoServer.Network.Tcp;
 using AssettoServer.Server;
 using Serilog;
 using TougePlugin.Packets;
+using AssettoServer.Shared.Network.Packets.Shared;
 
 namespace TougePlugin;
 
@@ -285,10 +286,10 @@ public class Race
             lowPingCar = Leader;
         }
 
-        highPingCar.Client?.SendChatMessage(message);
+        highPingCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = message });
         Touge.SendNotification(highPingCar.Client, message);
         await Task.Delay(highPingCar.Ping - lowPingCar.Ping);
-        lowPingCar.Client?.SendChatMessage(message);
+        lowPingCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = message });
         Touge.SendNotification(lowPingCar.Client, message);
     }
 

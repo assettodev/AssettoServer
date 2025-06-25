@@ -1,4 +1,4 @@
-local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/static/TougePlugin/"
+local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/touge/"
 
 local windowWidth = sim.windowWidth
 local windowHeight = sim.windowHeight

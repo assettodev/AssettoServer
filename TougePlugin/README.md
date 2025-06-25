@@ -1,4 +1,4 @@
-# Touge Plugin.
+# Touge Plugin backport for assetto-server 0.0.54
 
 A plugin for Assetto Corsa servers that enables cat-and-mouse-style **touge** racing with an engaging tie-breaker ruleset. Designed for competitive head-to-head driving with a configurable format. Find some live example servers running the plugin [here](https://assetto.scratchedclan.nl/servers).
 
@@ -27,7 +27,14 @@ A plugin for Assetto Corsa servers that enables cat-and-mouse-style **touge** ra
 
 ## Configuration
 
----
+
+## Configuration
+Enable the plugin in `extra_cfg.yml`
+```yaml
+EnablePlugins:
+- TougePlugin
+```
+
 ### `touge_starting_areas.ini`
 Used to setup the starting areas on various maps. You can use [comfy map](https://www.overtake.gg/downloads/comfy-map.52623/) to get the position and heading. The following example sets up two starting areas, one for Gunma and one for Imola. Configurations for different tracks can all be stored in the same file. A download link for a base configuration file that contains various starting positions for popular tracks will be added later. Also, feel free to share your configs in the [Discord](https://discord.gg/z22Pcsy3df).
 ```
@@ -44,8 +51,30 @@ chaser_pos = -195.3,467,-83.1
 chaser_heading = -17
 ```
 
+Example configuration (add to bottom of `extra_cfg.yml`)
+```yaml
 ---
-### `plugin_touge_cfg.yml`
+!TougeConfiguration
+# Car performance ratings keyed by car model name. Can range from 1 - 1000.
+CarPerformanceRatings:
+  ks_mazda_miata: 125
+  ks_toyota_ae86: 131
+# Maximum elo gain. Must be a positive value.
+MaxEloGain: 32
+# Number of races for which is player is marked as provisional for the elo system.
+ProvisionalRaces: 20
+# Maximum elo gain, when player is marked as provisional
+MaxEloGainProvisional: 50
+# Rolling start enabled.
+isRollingStart: false
+# Outrun timer in seconds. Chase car has to finish within this amount of time after the lead car crosses the finish line.
+outrunTime: 3
+# Local database mode enabled. If disabled please provide database connection information.
+isDbLocalMode: true
+# Connection string to PostgreSQL database. Can be left empty if isDbLocalMode = true.
+postgresqlConnectionString:
+```
+
 #### Elo Configuration
 
 ##### `CarPerformanceRatings`

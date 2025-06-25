@@ -1,16 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableDynamicLoading>true</EnableDynamicLoading>
-        <PlatformTarget>x64</PlatformTarget>
+        <SelfContained>false</SelfContained>
+        <DebugType>embedded</DebugType>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'linux-x64'">..\out-linux-x64\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'linux-arm64'">..\out-linux-arm64\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'win-x64'">..\out-win-x64\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <OutputPath>..\AssettoServer\bin\$(Configuration)\$(TargetFramework)\plugins\$(MSBuildProjectName)</OutputPath>
+        <OutputPath>..\AssettoServer\bin\$(Configuration)\$(TargetFramework)\win-x64\plugins\$(MSBuildProjectName)</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,8 +23,12 @@
         <PackageReference Include="Npgsql" Version="9.0.3" />
     </ItemGroup>
 
+
     <ItemGroup>
-        <ProjectReference Include="..\AssettoServer.Shared\AssettoServer.Shared.csproj" />
+        <ProjectReference Include="..\AssettoServer.Shared\AssettoServer.Shared.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
         <ProjectReference Include="..\AssettoServer\AssettoServer.csproj">
             <Private>false</Private>
             <ExcludeAssets>runtime</ExcludeAssets>
@@ -33,30 +42,34 @@
       <None Update="lua\teleport.lua">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\Elo.png">
+      <None Update="assets\Elo.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\fonts.zip">
+      <None Update="assets\fonts.zip">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\InviteMenu.png">
+      <None Update="assets\InviteMenu.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\Key.png">
+      <None Update="assets\Key.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\MKey.png">
+      <None Update="assets\MKey.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\PlayerCard.png">
+      <None Update="assets\PlayerCard.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\Standings.png">
+      <None Update="assets\Standings.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="wwwroot\Tutorial.png">
+      <None Update="assets\Tutorial.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="assets" />
     </ItemGroup>
 
 </Project>
