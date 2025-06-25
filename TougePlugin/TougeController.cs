@@ -56,7 +56,7 @@ public class TougeController : ControllerBase
     [HttpGet("fonts.zip")]
     public IActionResult GetFontsZip()
     {
-        return new PhysicalFileResult(Path.Join(AssetsBasePath, "fonts.zip"), "fonts/zip");
+        return new PhysicalFileResult(Path.Join(AssetsBasePath, "fonts.zip"), "application/zip");
     }
 
 
