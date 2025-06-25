@@ -26,12 +26,12 @@ public class FastTravelPlugin : CriticalBackgroundService, IAssettoServerAutosta
     {
         _aiSpline = aiSpline ?? throw new ConfigurationException("FastTravelPlugin does not work with AI traffic disabled");
         
-        if (configuration.RequireCollisionDisable && serverConfiguration.CSPTrackOptions.MinimumCSPVersion < CSPVersion.V0_2_3_p211)
+        if (configuration.RequireCollisionDisable && serverConfiguration.CSPTrackOptions.MinimumCSPVersion < 2974)
         {
             throw new ConfigurationException("FastTravelPlugin needs a minimum required CSP version of 0.2.3-preview211 (2974)");
         }
         
-        if (!configuration.RequireCollisionDisable && serverConfiguration.CSPTrackOptions.MinimumCSPVersion < CSPVersion.V0_2_0)
+        if (!configuration.RequireCollisionDisable && serverConfiguration.CSPTrackOptions.MinimumCSPVersion < 2651)
         {
             throw new ConfigurationException("FastTravelPlugin needs a minimum required CSP version of 0.2.0 (2651)");
         }

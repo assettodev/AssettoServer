@@ -17,7 +17,7 @@ local mapFixedTargetPosition = vec3(parsedTargetPos[1], parsedTargetPos[2], pars
 local mapZoomValue = JSON.parse(config.mapZoomValues)
 local mapMoveSpeed = JSON.parse(config.mapMoveSpeeds)
 
-local baseUrl = 'http://' .. ac.getServerIP() .. ':' .. ac.getServerPortHTTP() .. '/static/FastTravelPlugin/'
+local baseUrl = 'http://' .. ac.getServerIP() .. ':' .. ac.getServerPortHTTP() .. '/fasttravel/'
 
 local supportAPI_physics = physics.setGentleStop ~= nil
 local supportAPI_collision = physics.disableCarCollisions ~= nil
