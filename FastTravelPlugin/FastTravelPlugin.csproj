@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <SelfContained>false</SelfContained>
         <DebugType>embedded</DebugType>
-        <PublishDir>..\out-$(RuntimeIdentifier)\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'linux-x64'">..\out-linux-x64\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'linux-arm64'">..\out-linux-arm64\plugins\$(MSBuildProjectName)\</PublishDir>
+        <PublishDir Condition="'$(RuntimeIdentifier)' == 'win-x64'">..\out-win-x64\plugins\$(MSBuildProjectName)\</PublishDir>
         <PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
     </PropertyGroup>
 
@@ -17,21 +19,40 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AssettoServer.Shared\AssettoServer.Shared.csproj">
-          <Private>false</Private>
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </ProjectReference>
-      <ProjectReference Include="..\AssettoServer\AssettoServer.csproj">
-          <Private>false</Private>
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </ProjectReference>
+        <ProjectReference Include="..\AssettoServer.Shared\AssettoServer.Shared.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+        <ProjectReference Include="..\AssettoServer\AssettoServer.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
     </ItemGroup>
 
     <ItemGroup>
         <None Update="lua\fasttravel.lua">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="wwwroot\**\*">
+
+        <None Update="Content\cursor_ch.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\cursor_ng.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\cursor_player.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\cursor_std.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\mapicon_pa.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\mapicon_sp.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\mapicon_st.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
