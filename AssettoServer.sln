@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssettoServer.Tests", "Asse
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TougePlugin", "TougePlugin\TougePlugin.csproj", "{516788C4-1B1E-60D3-1B96-FF737431795C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastTravelPlugin", "FastTravelPlugin\FastTravelPlugin.csproj", "{070286DA-DC17-4D5A-6D22-AF46DC01E6
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{516788C4-1B1E-60D3-1B96-FF737431795C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{516788C4-1B1E-60D3-1B96-FF737431795C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{516788C4-1B1E-60D3-1B96-FF737431795C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{070286DA-DC17-4D5A-6D22-AF46DC01E654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{070286DA-DC17-4D5A-6D22-AF46DC01E654}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{070286DA-DC17-4D5A-6D22-AF46DC01E654}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{070286DA-DC17-4D5A-6D22-AF46DC01E654}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
