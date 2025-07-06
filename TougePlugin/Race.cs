@@ -68,7 +68,7 @@ public class Race
             // First teleport players to their starting positions.
             await TeleportToStartAsync(Leader, Follower, startingArea);
 
-            SendMessage("Race starting soon...");
+            SendMessage("比赛即将开始...");
             await Task.Delay(3000);
 
             HasStarted = true; // I don't know if this is used anywhere tbh.
@@ -86,27 +86,27 @@ public class Race
                         {
                             if (jumpstart == JumpstartResult.Both)
                             {
-                                SendMessage("Both players made a jumpstart.");
+                                SendMessage("双方均抢跑.");
                                 await RestartRaceAsync();
                                 break;
                             }
                             else if (jumpstart == JumpstartResult.Follower)
                             {
-                                SendMessage($"{FollowerName} made a jumpstart. {LeaderName} wins this race.");
+                                SendMessage($"{FollowerName} 抢跑. {LeaderName} 赢得了比赛.");
                                 return RaceResult.Win(Leader);
                             }
                             else
                             {
-                                SendMessage($"{LeaderName} made a jumpstart. {FollowerName} wins this race.");
+                                SendMessage($"{LeaderName} 抢跑. {FollowerName} 赢得了比赛.");
                                 return RaceResult.Win(Follower);
                             }
                         }
                     }
 
                     if (signalStage == 0)
-                        _ = SendTimedMessageAsync("Ready...");
+                        _ = SendTimedMessageAsync("各就位...");
                     else if (signalStage == 1)
-                        _ = SendTimedMessageAsync("Set...");
+                        _ = SendTimedMessageAsync("预备...");
                     else if (signalStage == 2)
                     {
                         if (_configuration.isRollingStart)
@@ -114,12 +114,12 @@ public class Race
                             // Check if cars are close enough to each other to give a valid "Go!".
                             if (!IsValidRollingStartPos())
                             {
-                                SendMessage("Players are not close enough for a fair rolling start.");
+                                SendMessage("双方玩家距离不够接近，无法开始滚动发车.");
                                 await RestartRaceAsync();
                                 break;
                             }
                         }
-                        _ = SendTimedMessageAsync("Go!");
+                        _ = SendTimedMessageAsync("开始!");
                         isGo = true;
                         break;
                     }
@@ -134,7 +134,7 @@ public class Race
 
             if (completed == _disconnected.Task)
             {
-                SendMessage("Race cancelled due to disconnection or forfeit.");
+                SendMessage("由于网络或投降导致比赛终止.");
                 return RaceResult.Disconnected(_disconnected.Task.Result.EntryCar);
             }
 
@@ -143,17 +143,17 @@ public class Race
                 // Who wins logic
                 if (!FollowerSetLap)
                 {
-                    SendMessage($"{FollowerName} did not finish in time. {LeaderName} wins!");
+                    SendMessage($"{FollowerName} 未及时完赛. {LeaderName} 获胜!");
                     winner = Leader;
                 }
                 else if (completed == _followerFirst.Task)
                 {
-                    SendMessage($"{FollowerName} overtook {LeaderName}. {FollowerName} wins!");
+                    SendMessage($"{FollowerName} 超越了 {LeaderName}. {FollowerName} 获胜!");
                     winner = Follower;
                 }
                 else
                 {
-                    SendMessage($"{LeaderName} did not pull away. It's a tie!");
+                    SendMessage($"{LeaderName} 未能甩开后车. 平局!");
                     return RaceResult.Tie();
                 }
             }
@@ -162,7 +162,7 @@ public class Race
         catch (Exception e)
         {
             Log.Error(e, "Error while running race.");
-            SendMessage("There was an error while runnning the race.");
+            SendMessage("比赛中途发生了错误!");
             return RaceResult.Tie();
         }
         finally
@@ -190,8 +190,8 @@ public class Race
 
     private async Task RestartRaceAsync()
     {
-        SendMessage("Returning both players to their starting positions.");
-        SendMessage("Race restarting soon...");
+        SendMessage("正在传送回起点，请稍后.");
+        SendMessage("比赛即将重启...");
         await Task.Delay(3000);
         Dictionary<string, Vector3>[] startingArea = await GetStartingAreaAsync();
         await TeleportToStartAsync(Leader, Follower, startingArea);

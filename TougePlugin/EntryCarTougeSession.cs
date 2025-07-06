@@ -94,23 +94,23 @@ public class EntryCarTougeSession
         if (currentSession != null)
         {
             if (currentSession.IsActive)
-                Reply("You are already in an active touge session.");
+                Reply("您已经处于一场山路对局中.");
             else
-                Reply("You have a pending session invite.");
+                Reply("您有待处理的战局邀请.");
         }
         else
         {
             if (car == _entryCar)
-                Reply("You cannot invite yourself to a session.");
+                Reply("您无法邀请您自己.");
             else
             {
                 currentSession = _plugin.GetSession(car).CurrentSession;
                 if (currentSession != null)
                 {
                     if (currentSession.IsActive)
-                        Reply("This car is already in a touge session.");
+                        Reply("该玩家已处于一场对局中.");
                     else
-                        Reply("This car has a pending touge session invite.");
+                        Reply("该玩家有仍未处理的对局邀请.");
                 }
                 else
                 {
@@ -120,7 +120,7 @@ public class EntryCarTougeSession
                     _plugin.GetSession(car).CurrentSession = currentSession;
 
                     // Send messages to both players
-                    _entryCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = $"You have challenged {car.Client?.Name} to a touge session." });
+                    _entryCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = $"您已经向 {car.Client?.Name} 发起了对局邀请." });
                     car.Client?.SendPacket(new InvitePacket { InviteSenderName = _entryCar.Client!.Name! });
 
                     _ = Task.Delay(10000).ContinueWith(_ =>
@@ -130,7 +130,7 @@ public class EntryCarTougeSession
                             CurrentSession = null;
                             _plugin.GetSession(car).CurrentSession = null;
 
-                            var timeoutMessage = "Touge session request has timed out.";
+                            var timeoutMessage = "对局请求超时.";
                             _entryCar.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = timeoutMessage });
                             car.Client?.SendPacket(new ChatMessage { SessionId = 255, Message = timeoutMessage });
                         }

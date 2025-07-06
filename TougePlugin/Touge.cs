@@ -236,11 +236,11 @@ public class Touge : CriticalBackgroundService, IAssettoServerAutostart
         if (nearestCar != null)
         {
             GetSession(client!.EntryCar).ChallengeCar(nearestCar);
-            SendNotification(client, "Invite sent!");
+            SendNotification(client, "邀请已发送!");
         }
         else
         {
-            SendNotification(client, "No car nearby!");
+            SendNotification(client, "附近没有车辆!");
         }
     }
 
@@ -265,11 +265,11 @@ public class Touge : CriticalBackgroundService, IAssettoServerAutostart
         {
             // Invite the recipientCar
             GetSession(client!.EntryCar).ChallengeCar(recipientCar);
-            SendNotification(client, "Invite sent!");
+            SendNotification(client, "邀请已发送!");
         }
         else
         {
-            SendNotification(client, "There was an issue sending the invite.");
+            SendNotification(client, "发送邀请中出现故障.");
         }
     }
 

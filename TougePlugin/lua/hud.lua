@@ -1,4 +1,4 @@
-local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/touge/"
+﻿local baseUrl = "http://" .. ac.getServerIP() .. ":" .. ac.getServerPortHTTP() .. "/touge/"
 
 local windowWidth = sim.windowWidth
 local windowHeight = sim.windowHeight
@@ -36,10 +36,10 @@ local RaceResults = {
 local hasTutorialHidden = false
 local isTutorialAutoHidden = false
 local keyBindings = {
-    { key = "N", description = "Invite\nnearby" },
-    { key = "I", description = "Invite\nmenu" },
-    { key = "F", description = "Forfeit\n"},
-    { key = "H", description = "Hide\ntutorial" },
+    { key = "N", description = "邀请\n玩家" },
+    { key = "I", description = "邀请\n菜单" },
+    { key = "F", description = "投降\n"},
+    { key = "H", description = "隐藏\n教程" },
 }
 
 local font = ""
@@ -283,7 +283,7 @@ function script.drawUI()
             ui.drawImage(standingsHudPath, vec2(0,0), scaling.vec2(387,213))
             if currentHudState == HudStates.FirstTwo then
                 ui.pushDWriteFont(fontSemiBold)
-                ui.dwriteDrawText("Standings", scaling.size(48), scaling.vec2(44, 37))
+                ui.dwriteDrawText("计分板", scaling.size(48), scaling.vec2(44, 37))
                 ui.popDWriteFont()
 
                 for i = 1, 2 do
@@ -310,19 +310,19 @@ function script.drawUI()
                 end
             elseif currentHudState == HudStates.SuddenDeath then
                 ui.pushDWriteFont(fontBold)
-                ui.dwriteDrawText("Sudden Death!", scaling.size(32), scaling.vec2(44, 80))
+                ui.dwriteDrawText("决胜局!", scaling.size(32), scaling.vec2(44, 80))
                 ui.popDWriteFont()
                 ui.pushDWriteFont(font)
-                ui.dwriteDrawText("First player to win a round.", scaling.size(18), scaling.vec2(44, 120))
+                ui.dwriteDrawText("首位冲线的玩家将获得胜利", scaling.size(18), scaling.vec2(44, 120))
                 ui.popDWriteFont()
             elseif currentHudState == HudStates.Finished then
                 if standings[3] == RaceResults.Win then
                     ui.pushDWriteFont(fontBold)
-                    ui.dwriteDrawText("You win!", scaling.size(32), scaling.vec2(44, 90))
+                    ui.dwriteDrawText("胜利!", scaling.size(32), scaling.vec2(44, 90))
                     ui.popDWriteFont()
                 else
                     ui.pushDWriteFont(fontBold)
-                    ui.dwriteDrawText("You lose.", scaling.size(32), scaling.vec2(44, 90))
+                    ui.dwriteDrawText("失败", scaling.size(32), scaling.vec2(44, 90))
                     ui.popDWriteFont()
                 end
             end
@@ -349,13 +349,13 @@ function script.drawUI()
             ui.transparentWindow("tutorialWindow", vec2(scaling.size(50), windowHeight - scaling.size(465)), scaling.vec2(584, 415), function ()
                 ui.drawImage(tutorialPath, vec2(0,0), scaling.vec2(584, 415))
                 ui.pushDWriteFont(fontSemiBold)
-                ui.dwriteDrawText("How to play", scaling.size(24), scaling.vec2(32, 32))
+                ui.dwriteDrawText("教学", scaling.size(24), scaling.vec2(32, 32))
                 ui.popDWriteFont()
                 ui.pushDWriteFont(font)
-                ui.dwriteDrawText("Chase car overtakes before finish: 1 point to the chase car.\nChase car stays close: draw, no points.\nLead car outruns: 1 point to the lead car.\n\nIf score is tied after the first two rounds: Sudden death.", scaling.size(14), scaling.vec2(32, 78))
+                ui.dwriteDrawText("在终点线之前追上前车: 后车获得1分.\n后车未被甩开: 平局.\n后车被前车甩开: 前车获得1分.\n\n如果前两局之后仍为平局，则会进入生死战", scaling.size(14), scaling.vec2(32, 78))
                 ui.popDWriteFont()
                 ui.pushDWriteFont(fontSemiBold)
-                ui.dwriteDrawText("Controls", scaling.size(24), scaling.vec2(32, 177))
+                ui.dwriteDrawText("功能", scaling.size(24), scaling.vec2(32, 177))
                 ui.popDWriteFont()
 
                 local scale = 0.8
@@ -399,7 +399,7 @@ function script.drawUI()
                 -- Draw the nearby section title once
                 if index == 1 then
                     ui.pushDWriteFont(font)
-                    ui.dwriteDrawText("Nearby", scaling.size(48), scaling.vec2(40, 40))
+                    ui.dwriteDrawText("附近", scaling.size(48), scaling.vec2(40, 40))
                     ui.popDWriteFont()
                 end
 
@@ -450,7 +450,7 @@ function script.drawUI()
             ui.dwriteDrawText(tostring(inviteSenderName), scaling.size(48), scaling.vec2(179,40))
             ui.popDWriteFont()
             ui.pushDWriteFont(font)
-            ui.dwriteDrawText("Challenged you!", scaling.size(36), scaling.vec2(180,95))
+            ui.dwriteDrawText("向你发起了挑战!", scaling.size(36), scaling.vec2(180,95))
         end)
     end
 
@@ -476,7 +476,7 @@ function script.drawUI()
             -- Draw the notification
             ui.drawImage(playerCardPath, vec2(0,0), scaling.vec2(705,172))
             ui.pushDWriteFont(fontSemiBold)
-            ui.dwriteDrawText("Hold for 3 seconds to forfeit.", scaling.size(18), scaling.vec2(179,40))
+            ui.dwriteDrawText("长按三秒投降.", scaling.size(18), scaling.vec2(179,40))
             ui.popDWriteFont()
         end)
     end

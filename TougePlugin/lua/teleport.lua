@@ -1,4 +1,4 @@
-local supportAPI_physics = physics.setGentleStop ~= nil -- For disabling physics
+﻿local supportAPI_physics = physics.setGentleStop ~= nil -- For disabling physics
 local supportAPI_collision = physics.disableCarCollisions ~= nil
 
 local teleportTimer = nil

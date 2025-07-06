@@ -26,14 +26,14 @@ public class TougeCommandModule : ACModuleBase
     {
         var currentSession = _plugin.GetSession(Client!.EntryCar).CurrentSession;
         if (currentSession == null)
-            Reply("You do not have a pending touge session invite.");
+            Reply("您有仍未处理的对局邀请.");
         else if (currentSession.Challenger == Client!.EntryCar)
-            Reply("You cannot accept an invite you sent.");
+            Reply("您无法接受你自己的邀请.");
         else if (currentSession.IsActive)
-            Reply("You are already in an active touge session.");
+            Reply("您已经处于对局中.");
         else
         {
-            Reply("Invite succesfully accepted!");
+            Reply("接受邀请成功!");
             // This currentSession object is shared among the two players.
             // They both hold a reference to it.
             await currentSession.StartAsync();
@@ -44,7 +44,7 @@ public class TougeCommandModule : ACModuleBase
     public void Teleport()
     {
         // For testing the teleport
-        Reply("Teleporting...");
+        Reply("传送中...");
 
         Client!.SendPacket(new TeleportPacket
         {
