@@ -8,7 +8,7 @@ public class CarSpawnYamlConverter : IYamlTypeConverter
 {
     public bool Accepts(Type type) => type == typeof(CarSpawn);
 
-    public object ReadYaml(IParser parser, Type type, ObjectDeserializer nestedObjectDeserializer)
+    public object ReadYaml(IParser parser, Type type)
     {
         parser.Consume<MappingStart>();
 
@@ -47,7 +47,7 @@ public class CarSpawnYamlConverter : IYamlTypeConverter
         return spawn;
     }
 
-    public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer nestedObjectSerializer)
+    public void WriteYaml(IEmitter emitter, object? value, Type type)
     {
         throw new NotImplementedException("Serialization is not needed.");
     }

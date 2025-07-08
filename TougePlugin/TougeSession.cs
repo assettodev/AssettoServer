@@ -4,6 +4,7 @@ using Serilog;
 using TougePlugin.Models;
 using TougePlugin.TougeRulesets;
 using TougePlugin.RaceTypes;
+using AssettoServer.Shared.Network.Packets.Shared;
 
 namespace TougePlugin;
 

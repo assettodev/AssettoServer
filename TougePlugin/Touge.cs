@@ -536,7 +536,7 @@ public class Touge : BackgroundService, IHostedService
         {
             throw new ConfigurationException("Touge plugin requires ClientMessages to be enabled in 'extra_cfg.yml'.");
         }
-        if (_serverConfig.Extra.MinimumCSPVersion < 1937)
+        if (_serverConfig.CSPTrackOptions.MinimumCSPVersion < 1937)
         {
             throw new ConfigurationException("Touge plugin requires minumum CSP version 1937 or newer 'extra_cfg.yml'.");
         }

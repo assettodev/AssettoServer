@@ -9,7 +9,7 @@ public class Vector3YamlConverter : IYamlTypeConverter
 {
     public bool Accepts(Type type) => type == typeof(Vector3);
 
-    public object? ReadYaml(IParser parser, Type type, ObjectDeserializer rootDeserializer)
+    public object? ReadYaml(IParser parser, Type type)
     {
         parser.Consume<SequenceStart>();
         float x = float.Parse(((Scalar)parser.Consume<Scalar>()).Value);
@@ -19,7 +19,7 @@ public class Vector3YamlConverter : IYamlTypeConverter
         return new Vector3(x, y, z);
     }
 
-    public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
+    public void WriteYaml(IEmitter emitter, object? value, Type type)
     {
         throw new NotImplementedException("Serialization is not needed.");
     }

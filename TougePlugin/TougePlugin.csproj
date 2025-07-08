@@ -72,8 +72,6 @@
       <None Update="assets\Toggle.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
     <ItemGroup>
