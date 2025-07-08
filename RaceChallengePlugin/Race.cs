@@ -2,6 +2,7 @@
 using System.Numerics;
 using AssettoServer.Server;
 using Serilog;
+using AssettoServer.Shared.Network.Packets.Shared;
 
 namespace RaceChallengePlugin;
 
