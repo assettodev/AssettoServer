@@ -6,7 +6,7 @@ namespace TougePlugin;
 public class SteamAPIClient()
 {
     private static readonly HttpClient _httpClient = new();
-    private static readonly string avatarFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins", "TougePlugin", "wwwroot", "avatars");
+    private static readonly string avatarFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins", "TougePlugin", "assets", "avatars");
 
     public static async Task GetSteamAvatarAsync(string ApiKey, string SteamId64)
     {
