@@ -98,7 +98,7 @@ ProvisionalRaces: 20
 # Maximum elo gain, when player is marked as provisional
 MaxEloGainProvisional: 50
 # Rolling start enabled.
-isRollingStart: false
+IsRollingStart: false
 # Whether to use the track's built-in finish line as the course endpoint.
 UseTrackFinish: true
 # Outrun timer in seconds. Chase car has to finish within this amount of time after the lead car crosses the finish line.
